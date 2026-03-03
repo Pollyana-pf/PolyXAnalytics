@@ -94,46 +94,4 @@ export default function App() {
       </main>
     </div>
   );
-}    pais_cod = st.selectbox("Membro ICH:", list(calc.ich_members.keys()))
-    amostras = st.number_input("Número de Amostras:", min_value=1, value=1)
-    
-# Execução
-res = calc.calculate(pais_cod, amostras)
-
-# Cards de Resumo
-col1, col2, col3 = st.columns(3)
-col1.metric("Custo Total (USD)", f"$ {res['Total']:,.2f}")
-col2.metric("Tecnologia", f"$ {res['Hardware']:,.2f}")
-col3.metric("Mão de Obra/PPP", f"$ {res['Operacional']:,.2f}")
-
-st.divider()
-
-# --- Seção de Exportação ---
-st.subheader("📊 Relatório de Precificação")
-
-# Criando DataFrame para o Relatório
-report_data = {
-    "Data do Relatório": [datetime.now().strftime("%d/%m/%Y %H:%M")],
-    "País/Agência": [calc.ich_members[pais_cod]['name']],
-    "Qtd Amostras": [amostras],
-    "Custo Tecnologia (USD)": [res['Hardware']],
-    "Custo Operacional (USD)": [res['Operacional']],
-    "Custo Qualidade/BPL (USD)": [res['Qualidade']],
-    "Total Estimado (USD)": [res['Total']]
 }
-df_report = pd.DataFrame(report_data)
-
-# Exibe a tabela no Dashboard
-st.table(df_report.T.rename(columns={0: "Valores Estimados"}))
-
-# Botão de Download
-csv = df_report.to_csv(index=False).encode('utf-8')
-
-st.download_button(
-    label="📥 Baixar Orçamento (CSV)",
-    data=csv,
-    file_name=f"orcamento_xrpd_{pais_cod}_{datetime.now().strftime('%Y%m%d')}.csv",
-    mime='text/csv',
-)
-
-st.success("Cálculo realizado seguindo os pesos de hardware dolarizado e operação via PPP.")
